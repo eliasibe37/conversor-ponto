@@ -1,87 +1,103 @@
 import streamlit as st
 import pandas as pd
-import pdfplumber
 import re
+from openpyxl import Workbook
+from openpyxl.styles import PatternFill, Font, Alignment, Border, Side
 from io import BytesIO
 
 # Configuração visual da página
-st.set_page_config(page_title="Conversor Ponto Parvi", page_icon="🕒")
-st.title("🕒 Conversor de Cartão Ponto - RCR")
-st.markdown("Suba o arquivo PDF para gerar a planilha limpa.")
+st.set_page_config(page_title="Automação Parvi", page_icon="📊")
 
-# Campo para subir o arquivo
-arquivo_pdf = st.file_uploader("Arraste o PDF aqui ou clique para selecionar", type=["pdf"])
+st.title("📊 Extrator de Pendências Globus")
+st.markdown("Arraste seu arquivo TXT aqui para gerar a planilha formatada.")
 
-if arquivo_pdf is not None:
-    dados_finais = []
+# Upload do arquivo via navegador
+arquivo_txt = st.file_uploader("Selecione o arquivo TXT", type=['txt'])
+
+if arquivo_txt is not None:
+    # Lendo os dados
+    linhas = arquivo_txt.getvalue().decode("latin-1").splitlines()
+    total_linhas = len(linhas)
     
-    with pdfplumber.open(arquivo_pdf) as pdf:
-        for pagina in pdf.pages:
-            # 1. Extração de Nome e Matrícula no topo da página
-            texto_topo = pagina.extract_text()
-            nome_f, mat_f = "N/A", "N/A"
-            for linha in texto_topo.split('\n'):
-                if "Matrícula:" in linha:
-                    m = re.search(r"Matrícula:\s*(\d+)", linha)
-                    if m: mat_f = m.group(1)
-                if "Funcionário:" in linha:
-                    nome_f = linha.split(":")[-1].strip()
+    dados_lista = []
+    mat, nome, func = None, None, None
+    
+    # Barra de progresso visual (a equipe vai amar isso!)
+    barra = st.progress(0)
+    status = st.empty()
 
-            # 2. PAREDE DE SEGURANÇA (Corte no pixel 250)
-            # Isso ignora fisicamente tudo à direita das batidas (CHP, Extras, etc)
-            caixa_corte = (0, 0, 250, pagina.height)
-            area_limpa = pagina.within_bbox(caixa_corte)
-            palavras = area_limpa.extract_words()
+    for i, linha in enumerate(linhas, 1):
+        if i % 100 == 0 or i == total_linhas:
+            barra.progress(i / total_linhas)
+            status.text(f"Analisando linha {i} de {total_linhas}...")
+
+        # Captura cabeçalho do funcionário
+        if re.match(r'^\d{6}/', linha):
+            mat = linha[0:6].strip()
+            nome = linha[14:35].strip()
+            func = linha[35:50].strip()
+
+        # Busca datas e ocorrências (Pega todos os dias do funcionário)
+        m_data = re.search(r'(\d{2}/\d{2}/\d{4})\s+(.*)', linha)
+        if m_data and mat:
+            data_texto = m_data.group(1)
+            conteudo = m_data.group(2).upper()
             
-            # Agrupar palavras por linha
-            linhas_dict = {}
-            for p in palavras:
-                top = round(p['top'])
-                encontrou = False
-                for t in linhas_dict.keys():
-                    if abs(t - top) <= 3:
-                        linhas_dict[t].append(p)
-                        encontrou = True
-                        break
-                if not encontrou:
-                    linhas_dict[top] = [p]
+            if "**" in conteudo or "SEM MOVIMENTO" in conteudo or "ATESTA" in conteudo:
+                dados_lista.append({
+                    "Matricula": mat, "NOME": nome, "FUNÇÃO": func,
+                    "Data": data_texto, "Globus": conteudo.replace("**", "").strip(),
+                    "OBSERVAÇÕES": ""
+                })
 
-            # 3. Processamento das batidas
-            for top in sorted(linhas_dict.keys()):
-                linha_objs = sorted(linhas_dict[top], key=lambda x: x['x0'])
-                
-                # Se a linha começa com data (DD/MM/AAAA)
-                if len(linha_objs) > 0 and re.match(r"^\d{2}/\d{2}/\d{4}", linha_objs[0]['text']):
-                    data_txt = linha_objs[0]['text']
-                    dia_txt = linha_objs[1]['text'] if len(linha_objs) > 1 else ""
-                    
-                    # Pega apenas horários que sobraram dentro do limite de 250 pixels
-                    horarios = [p['text'] for p in linha_objs if re.match(r"^\d{2}:\d{2}$", p['text'])]
-                    
-                    e1 = horarios[0] if len(horarios) >= 1 else ""
-                    s1 = horarios[1] if len(horarios) >= 2 else ""
-                    e2 = horarios[2] if len(horarios) >= 3 else ""
-                    s2 = horarios[3] if len(horarios) >= 4 else ""
-                    
-                    dados_finais.append([mat_f, nome_f, data_txt, dia_txt, e1, s1, e2, s2])
+    if dados_lista:
+        st.success(f"✅ Concluído! {len(dados_lista)} pendências encontradas.")
+        
+        # Organização dos dados
+        df = pd.DataFrame(dados_lista)
+        df['D_Ref'] = pd.to_datetime(df['Data'], format='%d/%m/%Y')
+        df = df.sort_values(by=['NOME', 'D_Ref']).drop(columns=['D_Ref'])
 
-    if dados_finais:
-        # Criar DataFrame
-        df = pd.DataFrame(dados_finais, columns=["Matricula", "Nome", "Data", "Dia", "Ent.1", "Sai.1", "Ent.2", "Sai.2"])
-        
-        st.success(f"✅ {len(dados_finais)} linhas processadas com sucesso!")
-        st.dataframe(df) # Mostra a prévia na tela
-        
-        # Preparar o download para Excel
+        # Criando o Excel na memória do servidor
         output = BytesIO()
-        with pd.ExcelWriter(output, engine='openpyxl') as writer:
-            df.to_excel(writer, index=False)
+        wb = Workbook()
+        ws = wb.active
+        ws.title = "Sem Movimentos"
+        ws.append(["Matricula", "NOME", "FUNÇÃO", "Data", "Globus", "OBSERVAÇÕES"])
+
+        # Estilização Parvi (Cabeçalho escuro e bordas)
+        preto_fill = PatternFill(start_color="333333", end_color="333333", fill_type="solid")
+        branco_font = Font(color="FFFFFF", bold=True)
+        borda_fina = Border(left=Side(style='thin'), right=Side(style='thin'), top=Side(style='thin'), bottom=Side(style='thin'))
+
+        for cell in ws[1]:
+            cell.fill = preto_fill
+            cell.font = branco_font
+            cell.alignment = Alignment(horizontal="center")
+            cell.border = borda_fina
+
+        for r_idx, row in enumerate(df.values, start=2):
+            for c_idx, value in enumerate(row, start=1):
+                cell = ws.cell(row=r_idx, column=c_idx, value=value)
+                cell.border = borda_fina
+
+        # Coluna de Obs em azul claro (estético)
+        azul_fill = PatternFill(start_color="D9E1F2", end_color="D9E1F2", fill_type="solid")
+        for r in range(2, len(df) + 2):
+            ws.cell(row=r, column=6).fill = azul_fill
+
+        # Ajuste de larguras
+        for col, larg in zip("ABCDEF", [12, 35, 25, 15, 25, 40]):
+            ws.column_dimensions[col].width = larg
+
+        wb.save(output)
         
+        # Botão de download
         st.download_button(
             label="📥 Baixar Planilha Excel",
             data=output.getvalue(),
-            file_name="ponto_rcr_finalizado.xlsx",
+            file_name="Relatorio_Final_Parvi.xlsx",
             mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
         )
     else:
-        st.warning("Nenhum dado de ponto foi encontrado. Verifique se o PDF está correto.")
+        st.warning("Nenhuma pendência encontrada com esses filtros.")
