@@ -3,7 +3,7 @@ import pandas as pd
 import re
 import io
 
-# Alteração do título da aba e do cabeçalho da página
+# Configuração da página e título oficial
 st.set_page_config(page_title="Listagem de Movimentos", layout="wide")
 st.title("📋 Listagem de Movimentos")
 
@@ -17,16 +17,20 @@ if uploaded_file is not None:
 
     for l_orig in linhas:
         l = l_orig.replace('*', ' ')
+        
+        # Captura estrita da matrícula do funcionário
         if "Funcionario :" in l:
             match_mat = re.search(r"Funcionario\s*:\s*(\d+)", l)
-            if match_mat: matricula_atual = match_mat.group(1).zfill(6)
+            if match_mat: 
+                matricula_atual = match_mat.group(1).zfill(6)
             continue
 
+        # Verifica se a linha começa com uma data válida
         if re.match(r"^\d{2}/\d{2}/\d{4}", l.strip()):
             data = l[0:10].strip()
             dia  = l[11:14].strip()
             
-            bloco_texto = l[15:100].upper()
+            bloco_texto = l[15:].upper()
             
             ocorrencia_final = ""
             linha_qv_final = ""
@@ -34,15 +38,14 @@ if uploaded_file is not None:
             # --- IDENTIFICAÇÃO DE EVENTOS IMPEDITIVOS ---
             is_afastamento = "AFAST" in bloco_texto or "AUXILIO" in bloco_texto
             
-            # --- LISTA DE ELITE (Tudo concentrado na coluna OCORRENCIA) ---
             if "ABONADO" in bloco_texto:
                 ocorrencia_final = "DIA ABONADO"
             elif "FERIADO" in bloco_texto:
                 ocorrencia_final = "FERIADO"
             elif is_afastamento:
-                ocorrencia_final = "AUXILIO DOENÇA"
+                ocorrencia_final = "BENEFICIO"
             elif "ATESTADO" in bloco_texto or "MEDICO" in bloco_texto or "MÉDICO" in bloco_texto:
-                ocorrencia_final = "ATESTADO MEDICO"
+                ocorrencia_final = "ATESTADO"
             elif "FERIAS" in bloco_texto or "FERIA" in bloco_texto:
                 ocorrencia_final = "FERIAS"
             elif "FALTA" in bloco_texto:
@@ -52,7 +55,7 @@ if uploaded_file is not None:
             elif "LICENÇA MATERNIDADE" in bloco_texto or "MATERNIDADE" in bloco_texto:
                 ocorrencia_final = "LICENÇA MATERNIDADE"
             elif "PATERNIDADE" in bloco_texto:
-                ocorrencia_final = "LICENÇA PATERNIDADE"
+                ocorrencia_final = "PATERNIDADE"
             elif "SUSPENSAO" in bloco_texto or "SUSPENSÃO" in bloco_texto:
                 ocorrencia_final = "SUSPENSÃO"
             elif "ADMISSAO" in bloco_texto or "ADMISSÃO" in bloco_texto:
@@ -63,7 +66,11 @@ if uploaded_file is not None:
                 ocorrencia_final = "CURSO"
             elif "DTRAB" in bloco_texto:
                 ocorrencia_final = "DTRAB"
-                linha_qv_final = l[43:55].strip()
+                # Captura dinâmica da Linha/QV antes da palavra DTRAB
+                trecho_anterior = l[15:l.upper().find("DTRAB")]
+                partes_texto = [p.strip() for p in trecho_anterior.split("  ") if p.strip() and not re.match(r'^\d{1,2}:\d{2}$', p.strip())]
+                if partes_texto:
+                    linha_qv_final = partes_texto[-1]
             else:
                 ocorrencia_final = l[56:75].strip().upper()
                 if ocorrencia_final == "6" or ocorrencia_final.isdigit():
@@ -72,43 +79,48 @@ if uploaded_file is not None:
 
             is_evento = ocorrencia_final != "DTRAB" and ocorrencia_final != ""
             
-            # Inicializa todas as colunas de resultado vazias
-            res = {col: "" for col in ["ENTRA", "I.INI", "I.FIN", "SAIDA", "NORMAL", "A.NOT", "TOTAL"]}
+            # Inicializa todas as colunas de resultados vazias
+            res = {col: "" for col in ["ENTRA", "I.INI", "I.FIN", "SAIDA", "NORMAL", "A.NOT", "EXTRA", "EX LN", "EXCES", "OUTRA", "C.NOT", "INCOM", "TOTAL"]}
             
-            # Captura dinâmica de todas as marcações de horas na linha atual
-            horarios = re.findall(r'\d{1,3}:\d{2}', l[15:])
-            
-            # DISTRIBUIÇÃO CONFIÁVEL DE HORÁRIOS
-            if not is_evento and len(horarios) >= 2:
-                # O último elemento impresso na extrema direita é sempre o TOTAL calculado
-                res["TOTAL"] = horarios[-1]
+            if not is_evento:
+                idx_divisor = l.upper().find("DTRAB")
                 
-                if len(horarios) >= 7:
-                    res["ENTRA"]  = horarios[0]
-                    res["I.INI"]  = horarios[1]
-                    res["I.FIN"]  = horarios[2]
-                    res["SAIDA"]  = horarios[3]
-                    res["NORMAL"] = horarios[-3] # Antepenúltimo
-                    res["A.NOT"]  = horarios[-2] # Penúltimo
-                elif len(horarios) == 6:
-                    res["ENTRA"]  = horarios[0]
-                    res["I.INI"]  = horarios[1]
-                    res["I.FIN"]  = horarios[2]
-                    res["SAIDA"]  = horarios[3]
-                    res["NORMAL"] = horarios[4]
-                elif len(horarios) == 5:
-                    res["ENTRA"]  = horarios[0]
-                    res["I.INI"]  = horarios[1]
-                    res["I.FIN"]  = horarios[2]
-                    res["SAIDA"]  = horarios[3]
-                elif len(horarios) == 4:
-                    res["ENTRA"]  = horarios[0]
-                    res["SAIDA"]  = horarios[1]
-                    res["NORMAL"] = horarios[2]
-                elif len(horarios) == 3:
-                    res["ENTRA"]  = horarios[0]
-                    res["SAIDA"]  = horarios[1]
-            
+                if idx_divisor != -1:
+                    # 1. PARTE ESQUERDA (BATIDAS REAIS DE PONTO)
+                    trecho_ponto = l[15:idx_divisor]
+                    batidas_ponto = re.findall(r'\d{1,2}:\d{2}', trecho_ponto)
+                    
+                    if len(batidas_ponto) == 4:
+                        res["ENTRA"], res["I.INI"], res["I.FIN"], res["SAIDA"] = batidas_ponto
+                    elif len(batidas_ponto) == 2:
+                        res["ENTRA"], res["SAIDA"] = batidas_ponto
+                    elif len(batidas_ponto) == 3:
+                        res["ENTRA"], res["I.INI"], res["SAIDA"] = batidas_ponto
+                    elif len(batidas_ponto) == 1:
+                        res["ENTRA"] = batidas_ponto[0]
+                    
+                    # 2. PARTE DIREITA (CÁLCULOS DO SISTEMA) - ALINHAMENTO FIXO ABSOLUTO
+                    c_normal = l[74:81].strip()
+                    c_anot   = l[81:88].strip()
+                    c_extra  = l[88:95].strip()
+                    c_exln   = l[95:102].strip()
+                    c_exces  = l[102:109].strip()
+                    c_outra  = l[109:116].strip()
+                    c_cnot   = l[116:123].strip()
+                    c_incom  = l[123:130].strip()
+                    c_total  = l[130:142].strip()
+                    
+                    # Validação com Regex para garantir que só insira horários válidos
+                    if re.match(r'^\d{1,3}:\d{2}$', c_normal): res["NORMAL"] = c_normal
+                    if re.match(r'^\d{1,3}:\d{2}$', c_anot):   res["A.NOT"]  = c_anot
+                    if re.match(r'^\d{1,3}:\d{2}$', c_extra):  res["EXTRA"]  = c_extra
+                    if re.match(r'^\d{1,3}:\d{2}$', c_exln):   res["EX LN"]  = c_exln
+                    if re.match(r'^\d{1,3}:\d{2}$', c_exces):  res["EXCES"]  = c_exces
+                    if re.match(r'^\d{1,3}:\d{2}$', c_outra):  res["OUTRA"]  = c_outra
+                    if re.match(r'^\d{1,3}:\d{2}$', c_cnot):   res["C.NOT"]  = c_cnot
+                    if re.match(r'^\d{1,3}:\d{2}$', c_incom):  res["INCOM"]  = c_incom
+                    if re.match(r'^\d{1,3}:\d{2}$', c_total):  res["TOTAL"]  = c_total
+
             if is_evento: 
                 linha_qv_final = ""
 
@@ -119,13 +131,12 @@ if uploaded_file is not None:
             if len(batidas_reais) != len(set(batidas_reais)):
                 observacao = "VERIFICAR"
 
-            # Dicionário mapeado estritamente com as suas colunas oficiais, sem orçamento
             dados.append({
                 "Matricula": matricula_atual, "DATA": data, "DIA": dia,
                 "ENTRA": res["ENTRA"], "I.INI": res["I.INI"], "I.FIN": res["I.FIN"], "SAIDA": res["SAIDA"],
                 "VAZIA": "", "LINHA/QV": linha_qv_final, "OCORRENCIA": ocorrencia_final,
-                "NORMAL": res["NORMAL"], "A.NOT": res["A.NOT"], "EXTRA": "", "EX LN": "", 
-                "EXCES": "", "OUTRA": "", "C.NOT": "", "INCOM": "", "TOTAL": res["TOTAL"], 
+                "NORMAL": res["NORMAL"], "A.NOT": res["A.NOT"], "EXTRA": res["EXTRA"], "EX LN": res["EX LN"], 
+                "EXCES": res["EXCES"], "OUTRA": res["OUTRA"], "C.NOT": res["C.NOT"], "INCOM": res["INCOM"], "TOTAL": res["TOTAL"], 
                 "OBSERVAÇÃO": observacao
             })
 
