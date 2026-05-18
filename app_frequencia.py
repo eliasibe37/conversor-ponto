@@ -35,7 +35,7 @@ if uploaded_file is not None:
             ocorrencia_final = ""
             linha_qv_final = ""
             
-            # --- IDENTIFICAÇÃO DE EVENTOS IMPEDITIVOS ---
+            # --- IDENTIFICAÇÃO DE EVENTOS IMPEDITIVOS COM NOMES CORRIGIDOS ---
             is_afastamento = "AFAST" in bloco_texto or "AUXILIO" in bloco_texto
             
             if "ABONADO" in bloco_texto:
@@ -99,7 +99,7 @@ if uploaded_file is not None:
                     elif len(batidas_ponto) == 1:
                         res["ENTRA"] = batidas_ponto[0]
                     
-                    # 2. PARTE DIREITA (CÁLCULOS DO SISTEMA) - ALINHAMENTO FIXO ABSOLUTO
+                    # 2. PARTE DIREITA (CÁLCULOS DO SISTEMA) - REGUA DE FATIAMENTO COMPROVADA
                     c_normal = l[74:81].strip()
                     c_anot   = l[81:88].strip()
                     c_extra  = l[88:95].strip()
@@ -110,7 +110,7 @@ if uploaded_file is not None:
                     c_incom  = l[123:130].strip()
                     c_total  = l[130:142].strip()
                     
-                    # Validação com Regex para garantir que só insira horários válidos
+                    # Validação com Regex para garantir a integridade dos formatos de hora
                     if re.match(r'^\d{1,3}:\d{2}$', c_normal): res["NORMAL"] = c_normal
                     if re.match(r'^\d{1,3}:\d{2}$', c_anot):   res["A.NOT"]  = c_anot
                     if re.match(r'^\d{1,3}:\d{2}$', c_extra):  res["EXTRA"]  = c_extra
