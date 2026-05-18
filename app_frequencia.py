@@ -66,11 +66,14 @@ if uploaded_file is not None:
                 ocorrencia_final = "CURSO"
             elif "DTRAB" in bloco_texto:
                 ocorrencia_final = "DTRAB"
-                # Captura dinâmica da Linha/QV antes da palavra DTRAB
+                # CORREÇÃO CRÍTICA: Remove cirurgicamente todos os horários (XX:XX) antes de isolar a Linha/QV
                 trecho_anterior = l[15:l.upper().find("DTRAB")]
-                partes_texto = [p.strip() for p in trecho_anterior.split("  ") if p.strip() and not re.match(r'^\d{1,2}:\d{2}$', p.strip())]
+                trecho_limpo = re.sub(r'\d{1,2}:\d{2}', '', trecho_anterior)
+                
+                # Agora pegamos apenas o texto limpo que restou (Ex: "PREPARACAO")
+                partes_texto = [p.strip() for p in trecho_limpo.split(" ") if p.strip()]
                 if partes_texto:
-                    linha_qv_final = partes_texto[-1]
+                    linha_qv_final = " ".join(partes_texto)
             else:
                 ocorrencia_final = l[56:75].strip().upper()
                 if ocorrencia_final == "6" or ocorrencia_final.isdigit():
@@ -99,7 +102,7 @@ if uploaded_file is not None:
                     elif len(batidas_ponto) == 1:
                         res["ENTRA"] = batidas_ponto[0]
                     
-                    # 2. PARTE DIREITA (CÁLCULOS DO SISTEMA) - REGUA DE FATIAMENTO COMPROVADA
+                    # 2. PARTE DIREITA (CÁLCULOS DO SISTEMA) - ALINHAMENTO FIXO ABSOLUTO
                     c_normal = l[74:81].strip()
                     c_anot   = l[81:88].strip()
                     c_extra  = l[88:95].strip()
