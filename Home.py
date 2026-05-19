@@ -4,7 +4,7 @@ import streamlit as st
 st.set_page_config(
     page_title="Portal de Utilitários - Planejamento",
     page_icon="📊",
-    layout="centered" # Deixando o conteúdo centralizado para ficar mais elegante
+    layout="centered"
 )
 
 # Estilização CSS para cores inspiradas na logo (Verde Esmeralda / Ciano)
@@ -26,8 +26,8 @@ st.markdown("""
             padding: 25px;
             border-radius: 15px;
             box-shadow: 0 10px 25px rgba(0,0,0,0.05);
-            margin-bottom: 20px;
-            height: 250px;
+            margin-bottom: 10px;
+            height: 180px; /* Reduzido um pouco para encaixar o botão logo abaixo */
         }
         .card h3 {
             color: #004D40;
@@ -52,20 +52,19 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# 1. Exibição da Logo (Arquivo que você subiu no GitHub)
+# 1. Exibição da Logo (Se estiver no GitHub)
 try:
     st.image("logo_planejamento.png", width=350)
 except:
-    # Caso a imagem ainda não esteja no GitHub, ele mostra um texto elegante
     st.markdown("<h2 style='text-align: center; color: #007A78;'>Parvi / RCR</h2>", unsafe_allow_html=True)
 
-# 2. Título Principal (Apenas Planejamento)
+# 2. Título Principal
 st.markdown('<h1 class="main-title">Portal de Utilitários do Planejamento</h1>', unsafe_allow_html=True)
 st.markdown("<p style='text-align: center; color: #607D8B;'>Central de ferramentas e automações para suporte ao planejamento operacional.</p>", unsafe_allow_html=True)
 
 st.write("---")
 
-# 3. Cards das Ferramentas
+# 3. Cards das Ferramentas com Botões de Acesso Real
 col1, col2 = st.columns(2)
 
 with col1:
@@ -73,18 +72,24 @@ with col1:
         <div class="card">
             <h3>📋 Movimentos</h3>
             <p>Processamento de arquivos TXT de ponto. Filtre por filiais, trate horas adicionais e confira escalas de forma automatizada.</p>
-            <p style="color: #00c4b4; font-weight: bold; margin-top: 20px;">➔ Acesse pelo menu lateral</p>
         </div>
     """, unsafe_allow_html=True)
+    
+    # Botão real que redireciona para a página "Frequencia" na pasta pages
+    if st.button("🚀 Abrir Movimentos", use_container_width=True):
+        st.switch_page("pages/Frequencia.py")
 
 with col2:
     st.markdown("""
         <div class="card">
             <h3>📄 Unificador PDF</h3>
             <p>Agrupe múltiplos relatórios e documentos PDF num único arquivo organizado em segundos.</p>
-            <p style="color: #00c4b4; font-weight: bold; margin-top: 20px;">➔ Acesse pelo menu lateral</p>
         </div>
     """, unsafe_allow_html=True)
+    
+    # Botão real que redireciona para a página "Unificador De PDF" na pasta pages
+    if st.button("🚀 Abrir Unificador PDF", use_container_width=True):
+        st.switch_page("pages/Unificador_De_PDF.py")
 
 # 4. Rodapé
 st.markdown("""
