@@ -1,152 +1,101 @@
 import streamlit as st
-import pandas as pd
-import re
-import io
 
-# Configuração da página e título oficial
-st.set_page_config(page_title="Listagem de Movimentos", layout="wide")
-st.title("📋 Listagem de Movimentos")
+# Configuração da página inicial do portal com o tema corporativo
+st.set_page_config(
+    page_title="Portal de Planejamento & RH - Parvi/RCR",
+    page_icon="🏢",
+    layout="wide",
+    initial_sidebar_state="expanded"
+)
 
-uploaded_file = st.file_uploader("Selecione o arquivo TXT", type=['txt'])
+# Estilização CSS personalizada para aplicar as cores da Parvi / RCR
+st.markdown("""
+    <style>
+        /* Cor de fundo principal e fontes */
+        .main-title {
+            color: #007A78;
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+        .subtitle {
+            color: #1D3557;
+            font-size: 1.2rem;
+            margin-bottom: 25px;
+        }
+        /* Estilo dos cards das ferramentas */
+        .card {
+            background-color: #F4F9F9;
+            border-left: 5px solid #009688;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
+        }
+        .card h3 {
+            color: #004D40;
+            margin-top: 0;
+        }
+        .card p {
+            color: #455A64;
+            font-size: 0.95rem;
+        }
+        /* Rodapé customizado */
+        .footer {
+            text-align: center;
+            color: #90A4AE;
+            font-size: 0.85rem;
+            margin-top: 50px;
+            padding-top: 20px;
+            border-top: 1px solid #ECEFF1;
+        }
+    </style>
+""", unsafe_allow_html=True)
 
-if uploaded_file is not None:
-    content = uploaded_file.getvalue().decode("latin1")
-    linhas = content.split('\n')
-    dados = []
-    matricula_atual = ""
+# Layout de duas colunas para o Cabeçalho (Simulando as duas marcas do grupo)
+col_logo1, col_logo2 = st.columns([1, 1])
+with col_logo1:
+    st.subheader("💚 Parvi Transportes")
+with col_logo2:
+    st.markdown("<h3 style='text-align: right; color: #007A78;'>RCR Locação 🏢</h3>", unsafe_allow_html=True)
 
-    for l_orig in linhas:
-        l = l_orig.replace('*', ' ')
-        
-        # Captura estrita da matrícula do funcionário
-        if "Funcionario :" in l:
-            match_mat = re.search(r"Funcionario\s*:\s*(\d+)", l)
-            if match_mat: 
-                matricula_atual = match_mat.group(1).zfill(6)
-            continue
+st.markdown("---")
 
-        # Verifica se a linha começa com uma data válida
-        if re.match(r"^\d{2}/\d{2}/\d{4}", l.strip()):
-            data = l[0:10].strip()
-            dia  = l[11:14].strip()
-            
-            bloco_texto = l[15:].upper()
-            
-            ocorrencia_final = ""
-            linha_qv_final = ""
-            
-            # --- IDENTIFICAÇÃO DE EVENTOS IMPEDITIVOS COM NOMES CORRIGIDOS ---
-            is_afastamento = "AFAST" in bloco_texto or "AUXILIO" in bloco_texto
-            
-            if "ABONADO" in bloco_texto:
-                ocorrencia_final = "DIA ABONADO"
-            elif "FERIADO" in bloco_texto:
-                ocorrencia_final = "FERIADO"
-            elif is_afastamento:
-                ocorrencia_final = "BENEFICIO"
-            elif "ATESTADO" in bloco_texto or "MEDICO" in bloco_texto or "MÉDICO" in bloco_texto:
-                ocorrencia_final = "ATESTADO"
-            elif "FERIAS" in bloco_texto or "FERIA" in bloco_texto:
-                ocorrencia_final = "FERIAS"
-            elif "FALTA" in bloco_texto:
-                ocorrencia_final = "FALTA"
-            elif "FOLGA" in bloco_texto:
-                ocorrencia_final = "FOLGA"
-            elif "LICENÇA MATERNIDADE" in bloco_texto or "MATERNIDADE" in bloco_texto:
-                ocorrencia_final = "LICENÇA MATERNIDADE"
-            elif "PATERNIDADE" in bloco_texto:
-                ocorrencia_final = "PATERNIDADE"
-            elif "SUSPENSAO" in bloco_texto or "SUSPENSÃO" in bloco_texto:
-                ocorrencia_final = "SUSPENSÃO"
-            elif "ADMISSAO" in bloco_texto or "ADMISSÃO" in bloco_texto:
-                ocorrencia_final = "ADMISSÃO"
-            elif "MOVIMENTO" in bloco_texto or "M VIMENTO" in bloco_texto:
-                ocorrencia_final = "SEM MOVIMENTO"
-            elif "CURSO" in bloco_texto:
-                ocorrencia_final = "CURSO"
-            elif "DTRAB" in bloco_texto:
-                ocorrencia_final = "DTRAB"
-                # CORREÇÃO CRÍTICA: Remove cirurgicamente todos os horários (XX:XX) antes de isolar a Linha/QV
-                trecho_anterior = l[15:l.upper().find("DTRAB")]
-                trecho_limpo = re.sub(r'\d{1,2}:\d{2}', '', trecho_anterior)
-                
-                # Agora pegamos apenas o texto limpo que restou (Ex: "PREPARACAO")
-                partes_texto = [p.strip() for p in trecho_limpo.split(" ") if p.strip()]
-                if partes_texto:
-                    linha_qv_final = " ".join(partes_texto)
-            else:
-                ocorrencia_final = l[56:75].strip().upper()
-                if ocorrencia_final == "6" or ocorrencia_final.isdigit():
-                    ocorrencia_final = ""
-                linha_qv_final = l[43:55].strip()
+# Título Principal e Subtítulo da Home
+st.markdown('<h1 class="main-title">📊 Portal de Planejamento & Recursos Humanos</h1>', unsafe_allow_html=True)
+st.markdown('<p class="subtitle">Bem-vindo ao centro de utilidades digitais da sua equipa. Selecione uma ferramenta no menu lateral esquerdo para iniciar as operações.</p>', unsafe_allow_html=True)
 
-            is_evento = ocorrencia_final != "DTRAB" and ocorrencia_final != ""
-            
-            # Inicializa todas as colunas de resultados vazias
-            res = {col: "" for col in ["ENTRA", "I.INI", "I.FIN", "SAIDA", "NORMAL", "A.NOT", "EXTRA", "EX LN", "EXCES", "OUTRA", "C.NOT", "INCOM", "TOTAL"]}
-            
-            if not is_evento:
-                idx_divisor = l.upper().find("DTRAB")
-                
-                if idx_divisor != -1:
-                    # 1. PARTE ESQUERDA (BATIDAS REAIS DE PONTO)
-                    trecho_ponto = l[15:idx_divisor]
-                    batidas_ponto = re.findall(r'\d{1,2}:\d{2}', trecho_ponto)
-                    
-                    if len(batidas_ponto) == 4:
-                        res["ENTRA"], res["I.INI"], res["I.FIN"], res["SAIDA"] = batidas_ponto
-                    elif len(batidas_ponto) == 2:
-                        res["ENTRA"], res["SAIDA"] = batidas_ponto
-                    elif len(batidas_ponto) == 3:
-                        res["ENTRA"], res["I.INI"], res["SAIDA"] = batidas_ponto
-                    elif len(batidas_ponto) == 1:
-                        res["ENTRA"] = batidas_ponto[0]
-                    
-                    # 2. PARTE DIREITA (CÁLCULOS DO SISTEMA) - ALINHAMENTO FIXO ABSOLUTO
-                    c_normal = l[74:81].strip()
-                    c_anot   = l[81:88].strip()
-                    c_extra  = l[88:95].strip()
-                    c_exln   = l[95:102].strip()
-                    c_exces  = l[102:109].strip()
-                    c_outra  = l[109:116].strip()
-                    c_cnot   = l[116:123].strip()
-                    c_incom  = l[123:130].strip()
-                    c_total  = l[130:142].strip()
-                    
-                    # Validação com Regex para garantir a integridade dos formatos de hora
-                    if re.match(r'^\d{1,3}:\d{2}$', c_normal): res["NORMAL"] = c_normal
-                    if re.match(r'^\d{1,3}:\d{2}$', c_anot):   res["A.NOT"]  = c_anot
-                    if re.match(r'^\d{1,3}:\d{2}$', c_extra):  res["EXTRA"]  = c_extra
-                    if re.match(r'^\d{1,3}:\d{2}$', c_exln):   res["EX LN"]  = c_exln
-                    if re.match(r'^\d{1,3}:\d{2}$', c_exces):  res["EXCES"]  = c_exces
-                    if re.match(r'^\d{1,3}:\d{2}$', c_outra):  res["OUTRA"]  = c_outra
-                    if re.match(r'^\d{1,3}:\d{2}$', c_cnot):   res["C.NOT"]  = c_cnot
-                    if re.match(r'^\d{1,3}:\d{2}$', c_incom):  res["INCOM"]  = c_incom
-                    if re.match(r'^\d{1,3}:\d{2}$', c_total):  res["TOTAL"]  = c_total
+# Divisão em colunas para apresentar os Apps ativos no menu lateral
+col1, col2 = st.columns(2)
 
-            if is_evento: 
-                linha_qv_final = ""
+with col1:
+    st.markdown("""
+        <div class="card">
+            <h3>📋 Listagem de Movimentos</h3>
+            <p><strong>Área de Frequência e Ponto:</strong> Submeta arquivos de dados no formato TXT para processamento automatizado, filtragem por filiais, tratamento de horas adicionais e conferência de escalas de colaboradores.</p>
+            <p style="color: #009688; font-weight: bold; font-size: 0.85rem;">➔ Disponível no menu à esquerda</p>
+        </div>
+    """, unsafe_allow_html=True)
 
-            # --- REGRA DE VERIFICAR DUPLICIDADE ---
-            observacao = ""
-            batidas = [res["ENTRA"], res["I.INI"], res["I.FIN"], res["SAIDA"]]
-            batidas_reais = [b for b in batidas if b != "" and b != "0:00" and b != "00:00"]
-            if len(batidas_reais) != len(set(batidas_reais)):
-                observacao = "VERIFICAR"
+with col2:
+    st.markdown("""
+        <div class="card" style="border-left-color: #0288D1;">
+            <h3 style="color: #01579B;">picture_as_pdf Unificador de PDF</h3>
+            <p><strong>Utilitários de Documentos:</strong> Agrupe múltiplos ficheiros PDF num único documento de forma rápida, segura e organizada. Ideal para juntar relatórios e guias de entrega.</p>
+            <p style="color: #0288D1; font-weight: bold; font-size: 0.85rem;">➔ Disponível no menu à esquerda</p>
+        </div>
+    """, unsafe_allow_html=True)
 
-            dados.append({
-                "Matricula": matricula_atual, "DATA": data, "DIA": dia,
-                "ENTRA": res["ENTRA"], "I.INI": res["I.INI"], "I.FIN": res["I.FIN"], "SAIDA": res["SAIDA"],
-                "VAZIA": "", "LINHA/QV": linha_qv_final, "OCORRENCIA": ocorrencia_final,
-                "NORMAL": res["NORMAL"], "A.NOT": res["A.NOT"], "EXTRA": res["EXTRA"], "EX LN": res["EX LN"], 
-                "EXCES": res["EXCES"], "OUTRA": res["OUTRA"], "C.NOT": res["C.NOT"], "INCOM": res["INCOM"], "TOTAL": res["TOTAL"], 
-                "OBSERVAÇÃO": observacao
-            })
+# Seção de avisos / notas importantes para o Planeamento
+st.markdown("### 📢 Avisos Importantes")
+st.info("""
+* **Segurança de Dados:** Certifique-se de que os arquivos de ponto extraídos cumprem as diretrizes internas antes de realizar o upload.
+* **Atualizações:** Este portal sincroniza diretamente com o repositório oficial. Novas ferramentas de automação de RH serão listadas aqui assim que forem homologadas.
+""")
 
-    if dados:
-        df = pd.DataFrame(dados)
-        st.dataframe(df, use_container_width=True)
-        output = io.BytesIO()
-        with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
-            df.to_excel(writer, index=False)
-        st.download_button(label="📥 BAIXAR PLANILHA", data=output.getvalue(), file_name="Listagem_de_Movimentos.xlsx")
+# Rodapé Corporativo
+st.markdown("""
+    <div class="footer">
+        Parvi Transportes & RCR Locação © 2026 | Desenvolvido para Controle de Frequência & Planeamento de Pessoal
+    </div>
+""", unsafe_allow_html=True)
