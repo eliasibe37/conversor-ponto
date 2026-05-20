@@ -1,59 +1,58 @@
 import streamlit as st
 
-# Configuração da página
-st.set_page_config(
-    page_title="Portal de Utilitários - Planejamento",
-    page_icon="📊",
-    layout="wide"
-)
+st.set_page_config(page_title="Portal de Utilitários", page_icon="📊", layout="wide")
 
-# 1. ESTILIZAÇÃO CSS (Fundo Branco)
+# CSS refinado para tipografia e espaçamento profissional
 st.markdown("""
     <style>
-        .main { background-color: #ffffff; }
-        .stApp { background-color: #ffffff; }
-        .main-title { color: #007A78; font-family: sans-serif; font-weight: 700; text-align: center; margin-bottom: 30px; }
-        .sub-text { text-align: center; color: #64748b; margin-bottom: 40px; }
-        .card {
-            background-color: #ffffff;
+        .stApp { background-color: #fcfcfc; }
+        .header { text-align: center; margin-bottom: 3rem; padding-top: 1rem; }
+        .header h1 { color: #0f172a; font-size: 2.2rem; font-weight: 700; margin-bottom: 0.5rem; }
+        .header p { color: #64748b; font-size: 1.1rem; }
+        
+        .card { 
+            background: #ffffff;
             border: 1px solid #e2e8f0;
-            border-top: 5px solid #00c4b4;
-            padding: 20px;
             border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-            height: 180px;
-            margin-bottom: 20px;
+            padding: 24px;
+            height: 200px; /* Altura fixa para todos os cartões */
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: all 0.2s ease;
         }
-        div.stButton > button { background-color: #007A78 !important; color: white !important; border-radius: 8px !important; border: none !important; width: 100%; }
-        .footer { text-align: center; color: #94a3b8; font-size: 0.85rem; margin-top: 50px; }
+        .card:hover { border-color: #007A78; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); }
+        .card h3 { color: #007A78; font-size: 1.25rem; margin: 0 0 10px 0; }
+        .card p { color: #475569; font-size: 0.95rem; line-height: 1.5; margin-bottom: 15px; }
     </style>
 """, unsafe_allow_html=True)
 
-st.markdown('<h1 class="main-title">Portal de Utilitários</h1>', unsafe_allow_html=True)
-st.markdown('<p class="sub-text">Inteligência e automação para o planejamento operacional.</p>', unsafe_allow_html=True)
+# Cabeçalho
+st.markdown('<div class="header"><h1>Portal de Utilitários</h1><p>Automação e Gestão de Planejamento Operacional</p></div>', unsafe_allow_html=True)
 
-# Organizando em 2 colunas para os 4 cards ficarem bem dimensionados
-col1, col2 = st.columns(2, gap="large")
-col3, col4 = st.columns(2, gap="large")
+# Configuração dos cards
+apps = [
+    ("Sem Movimento", "Controle de jornadas e indicadores operacionais.", "pages/Sem_Movimento.py"),
+    ("Listagem De Movimentos", "Tratamento de arquivos TXT de ponto e filtros.", "pages/Listagem_De_Movimentos.py"),
+    ("Unificador De PDF", "Agrupamento ágil de relatórios e guias.", "pages/Unificador_De_PDF.py"),
+    ("Conversor de Ponto", "Normalização de registros para sistemas.", "pages/Conversor_De_Registros_De_Ponto.py")
+]
 
-with col1:
-    st.markdown('<div class="card"><h3>Sem Movimento</h3><p>Controle de jornadas e acompanhamento.</p></div>', unsafe_allow_html=True)
-    if st.button("Abrir Sem Movimento", key="b1"):
-        st.switch_page("pages/Sem_Movimento.py")
+# Grid em 4 colunas
+cols = st.columns(4)
 
-with col2:
-    st.markdown('<div class="card"><h3>Listagem De Movimentos</h3><p>Tratamento de arquivos TXT de ponto.</p></div>', unsafe_allow_html=True)
-    if st.button("Abrir Listagem", key="b2"):
-        st.switch_page("pages/Listagem_De_Movimentos.py")
+for i, (titulo, desc, link) in enumerate(apps):
+    with cols[i]:
+        st.markdown(f'''
+            <div class="card">
+                <div>
+                    <h3>{titulo}</h3>
+                    <p>{desc}</p>
+                </div>
+            </div>
+        ''', unsafe_allow_html=True)
+        # O botão fica abaixo do card para não atrapalhar o design
+        if st.button(f"Acessar {titulo.split()[0]}", key=f"btn_{i}", use_container_width=True):
+            st.switch_page(link)
 
-with col3:
-    st.markdown('<div class="card"><h3>Unificador De PDF</h3><p>Agrupamento ágil de relatórios.</p></div>', unsafe_allow_html=True)
-    if st.button("Abrir Unificador", key="b3"):
-        st.switch_page("pages/Unificador_De_PDF.py")
-
-with col4:
-    st.markdown('<div class="card"><h3>Conversor de Ponto</h3><p>Normalização de registros de ponto.</p></div>', unsafe_allow_html=True)
-    if st.button("Abrir Conversor", key="b4"):
-        st.switch_page("pages/Conversor_De_Registros_De_Ponto.py")
-
-st.markdown('<div class="footer">Setor de Planejamento - Parvi Transportes & RCR Locação</div>', unsafe_allow_html=True)
+st.markdown('<div style="margin-top: 50px; text-align: center; color: #94a3b8; font-size: 0.8rem;">Setor de Planejamento - Parvi Transportes & RCR Locação</div>', unsafe_allow_html=True)
