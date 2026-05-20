@@ -44,16 +44,16 @@ st.markdown('<p class="sub-text">Inteligência e automação para o planejamento
 
 col1, col2, col3 = st.columns(3, gap="large")
 
-# Card 1: Frequencia
+# Card 1: Sem Movimento (Substituindo Frequencia)
 with col1:
     st.markdown("""
         <div class="card">
-            <h3>Frequencia</h3>
-            <p>Visão geral e painel de indicadores relacionados à frequência, controle de jornadas e acompanhamento operacional.</p>
+            <h3>Sem Movimento</h3>
+            <p>Visão geral e painel de indicadores relacionados, controle de jornadas e acompanhamento operacional.</p>
         </div>
     """, unsafe_allow_html=True)
-    if st.button("Abrir Frequencia", key="btn_freq", use_container_width=True):
-        st.switch_page("pages/Frequencia.py")
+    if st.button("Abrir Sem Movimento", key="btn_sem_mov", use_container_width=True):
+        st.switch_page("pages/Sem_Movimento.py")
 
 # Card 2: Listagem De Movimentos
 with col2:
