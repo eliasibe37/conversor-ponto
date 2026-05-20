@@ -1,79 +1,107 @@
 import streamlit as st
 
-# Configuração da página
+# Configuração da página - Usando 'wide' para caber as 3 colunas perfeitamente
 st.set_page_config(
     page_title="Portal de Utilitários - Planejamento",
     page_icon="📊",
     layout="wide"
 )
 
-# 1. ESTILIZAÇÃO CSS
+# Estilização CSS para cores inspiradas na logo (Verde Esmeralda / Ciano)
 st.markdown("""
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Poppins:wght@700&display=swap');
-        .main { background-color: #f8fafc; }
-        .main-title { color: #007A78; font-family: 'Poppins', sans-serif; font-weight: 700; text-align: center; margin-top: -20px; font-size: 2.8rem; }
-        .sub-text { text-align: center; color: #64748b; font-family: 'Inter', sans-serif; margin-bottom: 30px; font-size: 1.1rem; }
+        .main {
+            background-color: #f0f7f7;
+        }
+        .main-title {
+            color: #007A78;
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            font-weight: 800;
+            text-align: center;
+            margin-top: 10px;
+        }
         .card {
             background-color: white;
-            border-top: 6px solid #00c4b4;
-            padding: 25px;
-            border-radius: 20px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            height: 220px;
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-start;
-            margin-bottom: 15px;
+            border-top: 5px solid #00c4b4;
+            padding: 22px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+            margin-bottom: 10px;
+            height: 200px; /* Altura ajustada para os textos */
         }
-        .card:hover { transform: translateY(-8px); box-shadow: 0 12px 30px rgba(0,0,0,0.1); }
-        .card h3 { color: #0f172a; margin-bottom: 15px; font-size: 1.4rem; font-family: 'Poppins', sans-serif; }
-        .card p { color: #475569; font-size: 0.95rem; line-height: 1.6; font-family: 'Inter', sans-serif; }
-        div.stButton > button { background-color: #007A78 !important; color: white !important; border-radius: 12px !important; border: none !important; font-weight: 600 !important; }
-        div.stButton > button:hover { background-color: #00c4b4 !important; color: white !important; }
-        .footer { text-align: center; color: #94a3b8; font-size: 0.85rem; margin-top: 80px; font-family: 'Inter', sans-serif; }
+        .card h3 {
+            color: #004D40;
+            margin-bottom: 12px;
+            font-size: 1.3rem;
+        }
+        .card p {
+            color: #546E7A;
+            font-size: 0.88rem;
+            line-height: 1.4;
+        }
+        .footer {
+            text-align: center;
+            color: #90A4AE;
+            font-size: 0.8rem;
+            margin-top: 60px;
+        }
+        /* Ajuste para centralizar imagem */
+        [data-testid="stImage"] {
+            display: flex;
+            justify-content: center;
+        }
     </style>
 """, unsafe_allow_html=True)
 
-# --- CONTEÚDO ---
-st.markdown('<h1 class="main-title">Portal de Utilitários</h1>', unsafe_allow_html=True)
-st.markdown('<p class="sub-text">Inteligência e automação para o planejamento operacional.</p>', unsafe_allow_html=True)
+# 1. Exibição da Logo (Se estiver no GitHub)
+try:
+    st.image("logo_planejamento.png", width=350)
+except:
+    st.markdown("<h2 style='text-align: center; color: #007A78;'>Parvi / RCR</h2>", unsafe_allow_html=True)
 
-col1, col2, col3 = st.columns(3, gap="large")
+# 2. Título Principal
+st.markdown('<h1 class="main-title">Portal de Utilitários do Planejamento</h1>', unsafe_allow_html=True)
+st.markdown("<p style='text-align: center; color: #607D8B;'>Central de ferramentas e automações para suporte ao planejamento operacional.</p>", unsafe_allow_html=True)
 
-# Card 1: Sem Movimento
+st.write("---")
+
+# 3. Mapeamento das 3 colunas correspondentes ao menu lateral
+col1, col2, col3 = st.columns(3)
+
 with col1:
     st.markdown("""
         <div class="card">
-            <h3>Sem Movimento</h3>
-            <p>Visão geral e painel de indicadores relacionados, controle de jornadas e acompanhamento operacional.</p>
+            <h3>📊 Frequencia</h3>
+            <p>Visão geral e painel de indicadores relacionados à frequência, controle de jornadas e acompanhamento operacional da equipe.</p>
         </div>
     """, unsafe_allow_html=True)
-    # CORREÇÃO: O switch_page está dentro do if
-    if st.button("Abrir Sem Movimento", key="btn_sem_mov", use_container_width=True):
-        st.switch_page("pages/Sem_Movimento.py")
+    if st.button("🚀 Abrir Frequencia", use_container_width=True):
+        st.switch_page("pages/Frequencia.py")
 
-# Card 2: Listagem De Movimentos
 with col2:
     st.markdown("""
-        <div class="card">
-            <h3>Listagem De Movimentos</h3>
-            <p>Tratamento de arquivos TXT de ponto. Filtragem por filiais, tratamento de horas extras e folgas.</p>
+        <div class="card" style="border-top-color: #009688;">
+            <h3>📋 Listagem De Movimentos</h3>
+            <p>Tratamento de arquivos TXT de ponto. Filtragem por filiais, tratamento de horas extras, adicionais noturnos e folgas trabalhadas.</p>
         </div>
     """, unsafe_allow_html=True)
-    if st.button("Abrir Listagem De Movimentos", key="btn_mov", use_container_width=True):
+    if st.button("🚀 Abrir Movimentos", use_container_width=True):
         st.switch_page("pages/Listagem_De_Movimentos.py")
 
-# Card 3: Unificador De PDF
 with col3:
     st.markdown("""
-        <div class="card">
-            <h3>Unificador De PDF</h3>
-            <p>Agrupamento ágil de múltiplos arquivos PDF. Junte relatórios, escalas de serviço e guias em um único documento.</p>
+        <div class="card" style="border-top-color: #0288D1;">
+            <h3>📄 Unificador De PDF</h3>
+            <p>Agrupamento ágil de múltiplos arquivos PDF. Junte relatórios, escalas de serviço e guias em um único documento em segundos.</p>
         </div>
     """, unsafe_allow_html=True)
-    if st.button("Abrir Unificador De PDF", key="btn_pdf", use_container_width=True):
+    if st.button("🚀 Abrir Unificador PDF", use_container_width=True):
         st.switch_page("pages/Unificador_De_PDF.py")
 
-st.markdown('<div class="footer">Setor de Planejamento - Parvi Transportes & RCR Locação</div>', unsafe_allow_html=True)
+# 4. Rodapé
+st.markdown("""
+    <div class="footer">
+        Setor de Planejamento - Parvi Transportes & RCR Locação<br>
+        © 2026 Portal de Automação
+    </div>
+""", unsafe_allow_html=True)
