@@ -50,6 +50,7 @@ with col1:
             <p>Visão geral e painel de indicadores relacionados, controle de jornadas e acompanhamento operacional.</p>
         </div>
     """, unsafe_allow_html=True)
+    # CORREÇÃO: O switch_page está dentro do if
     if st.button("Abrir Sem Movimento", key="btn_sem_mov", use_container_width=True):
         st.switch_page("pages/Sem_Movimento.py")
 
