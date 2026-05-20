@@ -34,6 +34,8 @@ st.markdown("""
         .card p { color: #475569; font-size: 0.95rem; line-height: 1.6; font-family: 'Inter', sans-serif; }
 
         div.stButton > button { background-color: #007A78 !important; color: white !important; border-radius: 12px !important; border: none !important; font-weight: 600 !important; }
+        div.stButton > button:hover { background-color: #00c4b4 !important; color: white !important; }
+        
         .footer { text-align: center; color: #94a3b8; font-size: 0.85rem; margin-top: 80px; font-family: 'Inter', sans-serif; }
     </style>
 """, unsafe_allow_html=True)
@@ -42,9 +44,10 @@ st.markdown("""
 st.markdown('<h1 class="main-title">Portal de Utilitários</h1>', unsafe_allow_html=True)
 st.markdown('<p class="sub-text">Inteligência e automação para o planejamento operacional.</p>', unsafe_allow_html=True)
 
+# Criando as 3 colunas
 col1, col2, col3 = st.columns(3, gap="large")
 
-# Card 1: Sem Movimento (Substituindo Frequencia)
+# Card 1: Sem Movimento
 with col1:
     st.markdown("""
         <div class="card">
@@ -58,7 +61,7 @@ with col1:
 # Card 2: Listagem De Movimentos
 with col2:
     st.markdown("""
-        <div class="card" style="border-top-color: #009688;">
+        <div class="card">
             <h3>Listagem De Movimentos</h3>
             <p>Tratamento de arquivos TXT de ponto. Filtragem por filiais, tratamento de horas extras e folgas.</p>
         </div>
@@ -69,7 +72,7 @@ with col2:
 # Card 3: Unificador De PDF
 with col3:
     st.markdown("""
-        <div class="card" style="border-top-color: #009688;">
+        <div class="card">
             <h3>Unificador De PDF</h3>
             <p>Agrupamento ágil de múltiplos arquivos PDF. Junte relatórios, escalas de serviço e guias em um único documento.</p>
         </div>
