@@ -69,7 +69,7 @@ with col2:
 # Card 3: Unificador De PDF
 with col3:
     st.markdown("""
-        <div class="card" style="border-top-color: #0288D1;">
+        <div class="card" style="border-top-color: #009688;">
             <h3>Unificador De PDF</h3>
             <p>Agrupamento ágil de múltiplos arquivos PDF. Junte relatórios, escalas de serviço e guias em um único documento.</p>
         </div>
