@@ -1,41 +1,43 @@
 import streamlit as st
 
-# Configuração da página
 st.set_page_config(page_title="Portal de Utilitários", page_icon="📊", layout="wide")
 
-# Estilização
+# Estilização para garantir que os títulos fiquem verdes e o visual seja profissional
 st.markdown("""
     <style>
-        .card { background: #ffffff; border: 1px solid #e2e8f0; border-top: 5px solid #00c4b4; padding: 30px; border-radius: 16px; height: 220px; margin-bottom: 20px; }
-        div.stButton > button { background-color: #00c4b4 !important; color: white !important; border-radius: 12px !important; width: 100% !important; font-weight: 600 !important; }
+        .header { text-align: center; margin-bottom: 3rem; }
+        .card { 
+            background: #ffffff; 
+            border: 1px solid #e2e8f0; 
+            border-radius: 12px; 
+            padding: 20px; 
+            height: 250px; 
+            text-align: center; 
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
     </style>
 """, unsafe_allow_html=True)
 
-st.title("Portal de Utilitários")
+st.markdown('<div class="header"><h1>Portal de Utilitários</h1><p>Automação e Gestão de Planejamento Operacional</p></div>', unsafe_allow_html=True)
 
-# Criando as 4 colunas
-col1, col2, col3, col4 = st.columns(4)
+cols = st.columns(4)
 
-# Card 1
-with col1:
-    st.markdown('<div class="card"><h3>Sem Movimento</h3><p>Controle de jornadas e indicadores.</p></div>', unsafe_allow_html=True)
-    if st.button("Listar Sem Movimento", key="btn1"):
-        st.switch_page("pages/Sem_Movimento.py")
+# Configuração dos cards e botões
+cards = [
+    ("Sem Movimento", "Controle de jornadas e indicadores.", "Listar Sem Movimento", "pages/Sem_Movimento.py"),
+    ("Listagem De Movimentos", "Tratamento de arquivos TXT de ponto.", "Frequência", "pages/Listagem_De_Movimentos.py"),
+    ("Unificador De PDF", "Agrupamento ágil de relatórios.", "Unificar PDF", "pages/Unificador_De_PDF.py"),
+    ("Conversor de Ponto", "Normalização de registros.", "Converter Registros", "pages/Conversor_De_Registros_De_Ponto.py")
+]
 
-# Card 2
-with col2:
-    st.markdown('<div class="card"><h3>Listagem De Movimentos</h3><p>Tratamento de arquivos TXT de ponto.</p></div>', unsafe_allow_html=True)
-    if st.button("Frequência", key="btn2"):
-        st.switch_page("pages/Listagem_De_Movimentos.py")
-
-# Card 3
-with col3:
-    st.markdown('<div class="card"><h3>Unificador De PDF</h3><p>Agrupamento ágil de relatórios.</p></div>', unsafe_allow_html=True)
-    if st.button("Unificar PDF", key="btn3"):
-        st.switch_page("pages/Unificador_De_PDF.py")
-
-# Card 4
-with col4:
-    st.markdown('<div class="card"><h3>Conversor de Ponto</h3><p>Normalização de registros.</p></div>', unsafe_allow_html=True)
-    if st.button("Converter Registros", key="btn4"):
-        st.switch_page("pages/Conversor_De_Registros_De_Ponto.py")
+for i, (titulo, desc, nome_btn, link) in enumerate(cards):
+    with cols[i]:
+        st.markdown('<div class="card">', unsafe_allow_html=True)
+        # Título Verde (usando a cor primária do Streamlit)
+        st.markdown(f"<h3 style='color: #00c4b4;'>{titulo}</h3>", unsafe_allow_html=True)
+        st.write(desc)
+        
+        # Botão centralizado (o Streamlit centraliza botões em colunas automaticamente)
+        if st.button(nome_btn, key=f"btn_{i}"):
+            st.switch_page(link)
+        st.markdown('</div>', unsafe_allow_html=True)
