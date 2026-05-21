@@ -54,4 +54,14 @@ apps = [
 cols1 = st.columns(4)
 for i in range(4):
     with cols1[i]:
-        st.markdown(f'<div class="
+        st.markdown(f'<div class="card"><h3>{apps[i][0]}</h3><p>{apps[i][1]}</p></div>', unsafe_allow_html=True)
+        if st.button(apps[i][3], key=f"btn_{i}"):
+            st.switch_page(apps[i][2])
+
+# Linha 2: Centralizando o 5º card
+# Usamos colunas vazias para "empurrar" o card para a segunda posição
+c1, c2, c3, c4 = st.columns([1, 2, 2, 1])
+with c2:
+    st.markdown(f'<div class="card"><h3>{apps[4][0]}</h3><p>{apps[4][1]}</p></div>', unsafe_allow_html=True)
+    if st.button(apps[4][3], key="btn_4"):
+        st.switch_page(apps[4][2])
