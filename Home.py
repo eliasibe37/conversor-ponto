@@ -2,7 +2,7 @@ import streamlit as st
 
 st.set_page_config(page_title="Portal de Utilitários", page_icon="📊", layout="wide")
 
-# Estilização: Títulos maiores e visual compacto
+# Estilização Profissional
 st.markdown("""
     <style>
         .header { text-align: center; margin-bottom: 2.5rem; }
@@ -20,7 +20,6 @@ st.markdown("""
             flex-direction: column;
             justify-content: center;
         }
-        /* Título do cartão maior */
         .card h3 { color: #00c4b4; font-size: 1.4rem !important; margin-bottom: 12px; font-weight: 700; }
         .card p { color: #475569; font-size: 0.9rem; line-height: 1.4; margin-bottom: 15px; }
         
@@ -46,7 +45,7 @@ apps = [
     ("Folgas Trabalhadas", "Gestão de registros de folgas.", "pages/Folgas_Trabalhadas.py", "Acessar")
 ]
 
-# Grid de 3 colunas
+# Grid de 3 colunas para garantir o alinhamento
 cols = st.columns(3)
 
 for i, app in enumerate(apps):
@@ -55,4 +54,5 @@ for i, app in enumerate(apps):
         if st.button(app[3], key=f"btn_{i}"):
             st.switch_page(app[2])
 
-st.markdown('<div style="text-align: center; color: #94a3b8; font-size: 0.75rem; margin-top: 40px;">Setor de Planejamento - Parvi Transportes & RCR
+# Rodapé corrigido sem erros de sintaxe
+st.markdown('<div style="text-align: center; color: #94a3b8; font-size: 0.75rem; margin-top: 40px;">Setor de Planejamento - Parvi Transportes & RCR Locação</div>', unsafe_allow_html=True)
