@@ -2,32 +2,34 @@ import streamlit as st
 
 st.set_page_config(page_title="Portal de Utilitários", page_icon="📊", layout="wide")
 
-# Estilização profissional e compacta
+# Estilização: Títulos maiores e visual compacto
 st.markdown("""
     <style>
-        .header { text-align: center; margin-bottom: 2rem; }
+        .header { text-align: center; margin-bottom: 2.5rem; }
         .card { 
             background: #ffffff; 
             border: 1px solid #e2e8f0; 
-            border-top: 4px solid #00c4b4; 
-            border-radius: 8px; 
-            padding: 15px; 
-            height: 180px; 
+            border-top: 5px solid #00c4b4; 
+            border-radius: 10px; 
+            padding: 20px; 
+            height: 190px; 
             text-align: center; 
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            box-shadow: 0 3px 6px rgba(0,0,0,0.05);
             margin-bottom: 20px;
             display: flex;
             flex-direction: column;
             justify-content: center;
         }
-        .card h3 { color: #00c4b4; font-size: 1.1rem; margin-bottom: 10px; }
-        .card p { color: #475569; font-size: 0.85rem; line-height: 1.4; margin-bottom: 10px; }
+        /* Título do cartão maior */
+        .card h3 { color: #00c4b4; font-size: 1.4rem !important; margin-bottom: 12px; font-weight: 700; }
+        .card p { color: #475569; font-size: 0.9rem; line-height: 1.4; margin-bottom: 15px; }
+        
         div.stButton > button { 
             background-color: #00c4b4 !important; 
             color: white !important; 
             border-radius: 6px !important;
-            padding: 5px 15px !important;
-            font-size: 0.85rem !important;
+            padding: 6px 20px !important;
+            font-size: 0.9rem !important;
             font-weight: 600 !important;
             width: 100% !important;
         }
@@ -44,7 +46,7 @@ apps = [
     ("Folgas Trabalhadas", "Gestão de registros de folgas.", "pages/Folgas_Trabalhadas.py", "Acessar")
 ]
 
-# Grid de 3 colunas para um visual mais organizado
+# Grid de 3 colunas
 cols = st.columns(3)
 
 for i, app in enumerate(apps):
@@ -53,4 +55,4 @@ for i, app in enumerate(apps):
         if st.button(app[3], key=f"btn_{i}"):
             st.switch_page(app[2])
 
-st.markdown('<div style="text-align: center; color: #94a3b8; font-size: 0.75rem; margin-top: 40px;">Setor de Planejamento - Parvi Transportes & RCR Locação</div>', unsafe_allow_html=True)
+st.markdown('<div style="text-align: center; color: #94a3b8; font-size: 0.75rem; margin-top: 40px;">Setor de Planejamento - Parvi Transportes & RCR
