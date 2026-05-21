@@ -2,7 +2,7 @@ import streamlit as st
 
 st.set_page_config(page_title="Portal de Utilitários", page_icon="📊", layout="wide")
 
-# Estilização mantida conforme aprovado
+# Estilização mantida rigorosamente como você aprovou
 st.markdown("""
     <style>
         .stApp { background-color: #ffffff; }
@@ -41,7 +41,7 @@ st.markdown("""
 
 st.markdown('<div class="header"><h1>Portal de Utilitários</h1><p>Automação e Gestão de Planejamento Operacional</p></div>', unsafe_allow_html=True)
 
-# Definição dos apps
+# Lista de apps
 apps = [
     ("Sem Movimento", "Controle de jornadas e indicadores.", "pages/Sem_Movimento.py", "Listar Sem Movimento"),
     ("Listagem De Movimentos", "Tratamento de arquivos TXT de ponto.", "pages/Listagem_De_Movimentos.py", "Frequência"),
@@ -50,18 +50,15 @@ apps = [
     ("Folgas Trabalhadas", "Gestão de registros de folgas.", "pages/Folgas_Trabalhadas.py", "Folgas Trabalhadas")
 ]
 
-# Linha 1: 4 colunas
-cols1 = st.columns(4)
-for i in range(4):
-    with cols1[i]:
-        st.markdown(f'<div class="card"><h3>{apps[i][0]}</h3><p>{apps[i][1]}</p></div>', unsafe_allow_html=True)
-        if st.button(apps[i][3], key=f"btn_{i}"):
-            st.switch_page(apps[i][2])
+# Grid automático de 4 colunas por linha
+# O Streamlit ajustará automaticamente para uma nova linha quando necessário
+cols = st.columns(4)
 
-# Linha 2: Centralizando o 5º card
-# Usamos colunas vazias para "empurrar" o card para a segunda posição
-c1, c2, c3, c4 = st.columns([1, 2, 2, 1])
-with c2:
-    st.markdown(f'<div class="card"><h3>{apps[4][0]}</h3><p>{apps[4][1]}</p></div>', unsafe_allow_html=True)
-    if st.button(apps[4][3], key="btn_4"):
-        st.switch_page(apps[4][2])
+for i, app in enumerate(apps):
+    # Escolhe a coluna baseado no índice (o operador % 4 faz o reset para a linha de baixo)
+    with cols[i % 4]:
+        st.markdown(f'<div class="card"><h3>{app[0]}</h3><p>{app[1]}</p></div>', unsafe_allow_html=True)
+        if st.button(app[3], key=f"btn_{i}"):
+            st.switch_page(app[2])
+
+st.markdown('<div style="margin-top: 50px; text-align: center; color: #94a3b8; font-size: 0.8rem;">Setor de Planejamento - Parvi Transportes & RCR Locação</div>', unsafe_allow_html=True)
