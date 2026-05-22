@@ -26,11 +26,11 @@ st.title("Portal de Operações")
 st.markdown("---")
 
 apps = [
-    ("⚙️ Sem Movimento", "Controle de jornadas e indicadores.", "pages/Sem_Movimento.py", "Executar"),
-    ("📋 Listagem", "Tratamento de arquivos TXT de ponto.", "pages/Listagem_De_Movimentos.py", "Processar"),
-    ("📄 Unificador", "Agrupamento ágil de relatórios.", "pages/Unificador_De_PDF.py", "Unificar"),
-    ("🔄 Conversor", "Normalização de registros.", "pages/Conversor_De_Registros_De_Ponto.py", "Converter"),
-    ("📅 Folgas", "Gestão de registros de folgas.", "pages/Folgas_Trabalhadas.py", "Gerenciar")
+    ("⚙️ Sem Movimento", "Controle de dias em aberto.", "pages/Sem_Movimento.py", "Gerar dias Sem Movimento"),
+    ("📋 Listagem de Movimentos", "Tratamento de arquivos TXT de ponto.", "pages/Listagem_De_Movimentos.py", "Listar Frequência"),
+    ("📄 Unificador De PDF", "Agrupamento ágil de PDF.", "pages/Unificador_De_PDF.py", "Unir PDF"),
+    ("🔄 Conversor De PDF", "Converter PDF em Excel.", "pages/Conversor_De_Registros_De_Ponto.py", "Converter"),
+    ("📅 Folgas Trabalhadas", "Analise De Folgas Trabalhadas.", "pages/Folgas_Trabalhadas.py", "Analisar")
 ]
 
 cols = st.columns(3)
