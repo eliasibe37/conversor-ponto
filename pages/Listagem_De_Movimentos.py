@@ -64,6 +64,8 @@ if uploaded_file is not None:
                 ocorrencia_final = "SEM MOVIMENTO"
             elif "CURSO" in bloco_texto:
                 ocorrencia_final = "CURSO"
+            elif "EXAME" in bloco_texto or "PERIODICO" in bloco_texto or "PERIÓDICO" in bloco_texto:
+                ocorrencia_final = "EXAME PERIODICO"
             elif "DTRAB" in bloco_texto:
                 ocorrencia_final = "DTRAB"
                 # CORREÇÃO CRÍTICA: Remove cirurgicamente todos os horários (XX:XX) antes de isolar a Linha/QV
@@ -75,23 +77,26 @@ if uploaded_file is not None:
                 if partes_texto:
                     linha_qv_final = " ".join(partes_texto)
             else:
-                # Captura dinâmica para outras ocorrências de texto do sistema (como FPAG)
+                # Captura dinâmica para outras ocorrências de texto do sistema (como FPAG, FER10, FPAGH)
                 ocorrencia_final = l[56:75].strip().upper()
                 if ocorrencia_final == "6" or ocorrencia_final.isdigit():
                     ocorrencia_final = ""
                 linha_qv_final = l[43:55].strip()
 
-            # ALTERAÇÃO CIRÚRGICA: Se for DTRAB ou FPAG, NÃO trata como evento impeditivo de horários
-            is_evento = ocorrencia_final != "DTRAB" and ocorrencia_final != "FPAG" and ocorrencia_final != ""
+            # ALTERAÇÃO CIRÚRGICA: Adicionado FER10 e FPAGH para NÃO tratar como evento impeditivo de horários
+            liberam_horarios = ["DTRAB", "FPAG", "FER10", "FPAGH"]
+            is_evento = ocorrencia_final not in liberam_horarios and ocorrencia_final != ""
             
             # Inicializa todas as colunas de resultados vazias
             res = {col: "" for col in ["ENTRA", "I.INI", "I.FIN", "SAIDA", "NORMAL", "A.NOT", "EXTRA", "EX LN", "EXCES", "OUTRA", "C.NOT", "INCOM", "TOTAL"]}
             
             if not is_evento:
-                # Define o divisor dinamicamente (pode ser DTRAB ou FPAG)
-                idx_divisor = l.upper().find("DTRAB")
-                if idx_divisor == -1:
-                    idx_divisor = l.upper().find("FPAG")
+                # Define o divisor dinamicamente varrendo as 4 siglas permitidas
+                idx_divisor = -1
+                for sigla in liberam_horarios:
+                    idx_divisor = l.upper().find(sigla)
+                    if idx_divisor != -1:
+                        break
                 
                 if idx_divisor != -1:
                     # 1. PARTE ESQUERDA (BATIDAS REAIS DE PONTO)
@@ -107,7 +112,7 @@ if uploaded_file is not None:
                     elif len(batidas_ponto) == 1:
                         res["ENTRA"] = batidas_ponto[0]
                     
-                    # 2. PARTE DIREITA (CÁLCULOS DO SISTEMA) - ALINHAMENTO FIXO ABSOLUTO
+                    # 2. PARTE DIREITA (CÁLCULOS DO SISTEMA) - ALINHAMENTO FIXO ABSOLUTO PRESERVADO
                     c_normal = l[74:81].strip()
                     c_anot   = l[81:88].strip()
                     c_extra  = l[88:95].strip()
