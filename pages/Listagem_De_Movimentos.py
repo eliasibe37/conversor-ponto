@@ -66,6 +66,9 @@ if uploaded_file is not None:
                 ocorrencia_final = "CURSO"
             elif "EXAME" in bloco_texto or "PERIODICO" in bloco_texto or "PERIÓDICO" in bloco_texto:
                 ocorrencia_final = "EXAME PERIODICO"
+            elif "CASAMENTO" in bloco_texto:
+                # ADICIONADO CIRURGICAMENTE: Mapeia o evento de casamento limpando os horários da esquerda
+                ocorrencia_final = "CASAMENTO"
             elif "DTRAB" in bloco_texto:
                 ocorrencia_final = "DTRAB"
                 # CORREÇÃO CRÍTICA: Remove cirurgicamente todos os horários (XX:XX) antes de isolar a Linha/QV
@@ -83,7 +86,7 @@ if uploaded_file is not None:
                     ocorrencia_final = ""
                 linha_qv_final = l[43:55].strip()
 
-            # ALTERAÇÃO CIRÚRGICA: Adicionado FER10 e FPAGH para NÃO tratar como evento impeditivo de horários
+            # REGRA PRESERVADA: Se for DTRAB, FPAG, FER10 ou FPAGH, NÃO trata como evento impeditivo de horários
             liberam_horarios = ["DTRAB", "FPAG", "FER10", "FPAGH"]
             is_evento = ocorrencia_final not in liberam_horarios and ocorrencia_final != ""
             
