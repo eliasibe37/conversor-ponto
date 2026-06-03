@@ -50,6 +50,8 @@ if uploaded_file is not None:
                 ocorrencia_final = "FERIAS"
             elif "FALTA" in bloco_texto:
                 ocorrencia_final = "FALTA"
+            elif "COMPENSAD" in bloco_texto:
+                ocorrencia_final = "FOLGA COMPENSADA"
             elif "FOLGA" in bloco_texto:
                 ocorrencia_final = "FOLGA"
             elif "LICENÇA MATERNIDADE" in bloco_texto or "MATERNIDADE" in bloco_texto:
@@ -64,11 +66,11 @@ if uploaded_file is not None:
                 ocorrencia_final = "SEM MOVIMENTO"
             elif "CURSO" in bloco_texto:
                 ocorrencia_final = "CURSO"
-            elif "EXAME" in bloco_texto or "PERIODICO" in bloco_texto or "PERIÓDICO" in bloco_texto:
-                ocorrencia_final = "EXAME PERIODICO"
             elif "CASAMENTO" in bloco_texto:
-                # ADICIONADO CIRURGICAMENTE: Mapeia o evento de casamento limpando os horários da esquerda
                 ocorrencia_final = "CASAMENTO"
+            elif "EXAME" in bloco_texto or "PERIODICO" in bloco_texto or "PERIÓDICO" in bloco_texto:
+                # RETORNADO CIRURGICAMENTE: Exame Periódico voltou a ser evento que limpa horas
+                ocorrencia_final = "EXAME PERIODICO"
             elif "DTRAB" in bloco_texto:
                 ocorrencia_final = "DTRAB"
                 # CORREÇÃO CRÍTICA: Remove cirurgicamente todos os horários (XX:XX) antes de isolar a Linha/QV
@@ -80,21 +82,21 @@ if uploaded_file is not None:
                 if partes_texto:
                     linha_qv_final = " ".join(partes_texto)
             else:
-                # Captura dinâmica para outras ocorrências de texto do sistema (como FPAG, FER10, FPAGH)
+                # Captura dinâmica para outras ocorrências de texto do sistema (FPAG, FER10, FPAGH, FOTRA, CONSM, HSABO, DECMD)
                 ocorrencia_final = l[56:75].strip().upper()
                 if ocorrencia_final == "6" or ocorrencia_final.isdigit():
                     ocorrencia_final = ""
                 linha_qv_final = l[43:55].strip()
 
-            # REGRA PRESERVADA: Se for DTRAB, FPAG, FER10 ou FPAGH, NÃO trata como evento impeditivo de horários
-            liberam_horarios = ["DTRAB", "FPAG", "FER10", "FPAGH"]
+            # ALTERAÇÃO CIRÚRGICA: Apenas siglas reais que trazem horários permitidos
+            liberam_horarios = ["DTRAB", "FPAG", "FER10", "FPAGH", "FOTRA", "CONSM", "HSABO", "DECMD"]
             is_evento = ocorrencia_final not in liberam_horarios and ocorrencia_final != ""
             
             # Inicializa todas as colunas de resultados vazias
             res = {col: "" for col in ["ENTRA", "I.INI", "I.FIN", "SAIDA", "NORMAL", "A.NOT", "EXTRA", "EX LN", "EXCES", "OUTRA", "C.NOT", "INCOM", "TOTAL"]}
             
             if not is_evento:
-                # Define o divisor dinamicamente varrendo as 4 siglas permitidas
+                # Define o divisor dinamicamente varrendo as siglas permitidas
                 idx_divisor = -1
                 for sigla in liberam_horarios:
                     idx_divisor = l.upper().find(sigla)
