@@ -9,8 +9,8 @@ from openpyxl.utils import get_column_letter
 
 st.set_page_config(page_title="Comparativo Executivo Globus", page_icon="📊", layout="wide")
 
-st.title("📊 Conversor & Comparativo Multimeses - Globus RCR")
-st.markdown("`Versão Executiva MoM 24.1` - Setas Coloridas de Tendência.")
+st.title("📊 Comparativo De Resumo Do Acumulado - TXT Globus")
+st.markdown("`Compare Até 5 Meses Simultaneamente` - Analise De Resumo.")
 
 # ==========================================
 # FUNÇÕES DE TRATAMENTO DE DADOS
