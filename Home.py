@@ -31,7 +31,7 @@ apps = [
     ("📄 Unificador De PDF", "Agrupamento ágil de PDF.", "pages/Unificador_De_PDF.py", "Unir PDF"),
     ("🔄 Conversor De PDF", "Converter PDF em Excel.", "pages/Conversor_De_Registros_De_Ponto.py", "Converter"),
     ("📅 Folgas Trabalhadas", "Analise De Folgas Trabalhadas.", "pages/Folgas_Trabalhadas.py", "Analisar"),
-    ("📈 Comparativo Mensal", "Análise comparativa de frequência multimeses.", "pages/Comparativo_Mensal.py", "Comparar Meses")
+    ("📈 Resumo Do Acumulado", "Compare Resumo Mensalmente.", "pages/Comparativo_Mensal.py", "Resumo Do Acumulado")
 ]
 
 cols = st.columns(3)
