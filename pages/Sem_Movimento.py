@@ -20,11 +20,11 @@ def processar_globus(arquivo_txt):
             data = linha[50:62].strip()
             if mat:
                 dados.append({
-                    "Matricula": mat,
+                    "MATRICULA": mat,
                     "NOME": nome,
                     "FUNÇÃO": func,
-                    "Data": data,
-                    "Globus": "SEM MOVIMENTO",
+                    "DATA": data,
+                    "GLOBUS": "SEM MOVIMENTO",
                     "OBSERVAÇÕES": ""
                 })
     return pd.DataFrame(dados)
