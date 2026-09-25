@@ -30,7 +30,8 @@ apps = [
     ("📋 Listagem de Movimentos", "Tratamento de arquivos TXT de ponto.", "pages/Listagem_De_Movimentos.py", "Listar Frequência"),
     ("📄 Unificador De PDF", "Agrupamento ágil de PDF.", "pages/Unificador_De_PDF.py", "Unir PDF"),
     ("🔄 Conversor De PDF", "Converter PDF em Excel.", "pages/Conversor_De_Registros_De_Ponto.py", "Converter"),
-    ("📅 Folgas Trabalhadas", "Analise De Folgas Trabalhadas.", "pages/Folgas_Trabalhadas.py", "Analisar")
+    ("📅 Folgas Trabalhadas", "Analise De Folgas Trabalhadas.", "pages/Folgas_Trabalhadas.py", "Analisar"),
+    ("📈 Comparativo Mensal", "Análise comparativa de frequência multimeses.", "pages/Comparativo_Mensal.py", "Comparar Meses")
 ]
 
 cols = st.columns(3)
